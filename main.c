@@ -15,6 +15,7 @@
 #include <signal.h> // To catch the ctrl-c signal
 #include <pthread.h> // Enable threads
 #include <string.h>
+#include <stdlib.h>
 
 
 // _________________________________________________
@@ -31,60 +32,74 @@
 unsigned long previous_buttonInterrupt_time = 0; 
 // When 'Program_Mode' is 1, the program is running and when 0 the program is terminated
 static volatile int Program_Mode = 1; 
+static volatile int Voltage_List_COUNT = 1; 
 
-char symbol[] = {' ','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','0','1','2','3','4','5','6','7','8','9'};
-char * morseCode[] = {'0000000','01','1000','1010','100','0','0010','110','0000','00','0111','101','0100','11','10','111','0110','1101','010','000','1','001','0001','011','1001','1011','1100','01111','00111','00011','00001','00000','10000','11000','11100','11110','11111'};
+const char symbol[37] = {' ','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','0','1','2','3','4','5','6','7','8','9'};
+const char *morseCode[37] = {"0000000","01","1000","1010","100","0","0010","110","0000","00","0111","101","0100","11","10","111","0110","1101","010","000","1","001","0001","011","1001","1011","1100","01111","00111","00011","00001","00000","10000","11000","11100","11110","11111"};
 // _________________________________________________
 //  Linked List Definitions
 // _________________________________________________
 
-struct Voltage_Node{
-     int data;
-     struct Voltage_Node * next;
+typedef struct Voltage_List_Type {
+    int data;
+    struct Voltage_List_Type * next;
 } Voltage_List;
 
-struct Message_Node{
-     char symbol;
-     struct Message_Node * next;
+typedef struct Message_List_Type {
+    char symbol;
+    struct Message_List_Type * next;
 } Message_List;
 
-Voltage_List * head_Voltage = NULL;
-Message_List * head_Message = NULL;
+Message_List * Head_Message = NULL;
+Voltage_List * Head_Voltage = NULL;
 
+/*
+void print_list(Voltage_List * head) {
+    Voltage_List * current = head;
 
-void linkedListInit() {
-     head_Voltage = (Voltage_List *) malloc(sizeof(Voltage_List));
-     head_Message = (Message_List *) malloc(sizeof(Message_List));
+    while (current != NULL) {
+        printf("%d\n", current->data);
+        current = current->next;
+    }
+}*/
 
-     head_Voltage->data = 0;
-     head_Voltage->next = NULL;
-
-     head_Message->symbol = ' ';
-     head_Message->next = NULL;
-}
-
-void pushVoltage(Voltage_List * head_Voltage, int newData) {
-    Voltage_List * current = head_Voltage;
+void pushVoltage(Voltage_List * head, int newData) {
+    // Adds a element to the end of the Voltage linked list
+    Voltage_List * current = head;
     while (current->next != NULL) {
         current = current->next;
     }
+
     current->next = (Voltage_List *) malloc(sizeof(Voltage_List));
     current->next->data = newData;
     current->next->next = NULL;
 }
 
-void pushMessage(Message_List * head_Message, symbol newChar) {
-    Message_List * current = head_Message;
+void pushMessage(Message_List * head, char newSymbol) {
+    // Adds a element to the end of the Final Message linked list
+    Message_List * current = head;
     while (current->next != NULL) {
         current = current->next;
     }
+
     current->next = (Message_List *) malloc(sizeof(Message_List));
-    current->next->data = newChar;
+    current->next->symbol = newSymbol;
     current->next->next = NULL;
 }
 
+void linkedList_Init(){
+    // Create the first element of the both the voltage and final message linked list
+    Head_Voltage= (Voltage_List *) malloc(sizeof(Voltage_List));
+    Head_Message= (Message_List *) malloc(sizeof(Message_List));
+     if (Head_Message == NULL || Head_Voltage == NULL) {
+          printf("Memory failed to initiate");
+     }
 
-
+     Head_Voltage->data= 0;
+     Head_Voltage->next = NULL;
+     Head_Message->symbol= ' ';
+     Head_Message->next = NULL;
+}
 
 // _________________________________________________
 //  Supporting Functions
@@ -98,7 +113,7 @@ void buttonInterrupt(){
           pinMode(LED_PIN,OUTPUT);
           digitalWrite(LED_PIN,HIGH);
 
-          enableADC();
+     
       }
      previous_buttonInterrupt_time = buttonInterrupt_time;
 }
@@ -119,10 +134,13 @@ void Termination_Handler() {
 }
 
 void Conversion(){
-     // The symbols and morse code array have a fixed length of 37
-     for (int i=0; i<37; i++) {
+    
 
      }
+}
+
+void DashDot(){
+
 }
 
 // _________________________________________________
@@ -132,6 +150,7 @@ void Conversion(){
 int main(){
      printf("MORSE CODE DECIPHER\n");
      printf("Please press the button to begin\n");
+     linkedList_Init();  // Create the first element of the linked list
      
      wiringPiSetupGpio();    // This sets the pin numbering system to the BCM pin number system
      
@@ -139,14 +158,18 @@ int main(){
      pinMode(BUTTON_PIN, INPUT);        // Sets the pin to recieve an input
      pullUpDnControl(BUTTON_PIN, PUD_UP);      // Enables the pull down resistor on the button 
 
-
      signal(SIGINT, Termination_Handler); // This catches the termination ctrl-c in terminal
+     enableADC();
+     
 
      while(Program_Mode){
           wiringPiISR(BUTTON_PIN, INT_EDGE_BOTH, &buttonInterrupt);  // Sets the button listener to call the interupt method when pressed
          
           delay(100);
-          printf("%d\n", analogRead(ADC_CHANNEL));
+          
+          pushVoltage(Head_Voltage,analogRead(ADC_CHANNEL));
+          //printf("%d\n", analogRead(ADC_CHANNEL));
+     
      }
 
 return 0 ;
