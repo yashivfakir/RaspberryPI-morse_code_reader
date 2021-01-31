@@ -33,6 +33,7 @@ unsigned long previous_buttonInterrupt_time = 0;
 // When 'Program_Mode' is 1, the program is running and when 0 the program is terminated
 static volatile int Program_Mode = 1; 
 static volatile int Voltage_List_COUNT = 1; 
+static volatile int length_DOT = 0; 
 
 const char symbol[37] = {' ','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','0','1','2','3','4','5','6','7','8','9'};
 const char *morseCode[37] = {"0000000","01","1000","1010","100","0","0010","110","0000","00","0111","101","0100","11","10","111","0110","1101","010","000","1","001","0001","011","1001","1011","1100","01111","00111","00011","00001","00000","10000","11000","11100","11110","11111"};
@@ -70,6 +71,7 @@ void pushVoltage(Voltage_List * head, int newData) {
         current = current->next;
     }
 
+    Voltage_List_COUNT += 1; // Updates the global voltage linked list counter
     current->next = (Voltage_List *) malloc(sizeof(Voltage_List));
     current->next->data = newData;
     current->next->next = NULL;
@@ -92,7 +94,7 @@ void linkedList_Init(){
     Head_Voltage= (Voltage_List *) malloc(sizeof(Voltage_List));
     Head_Message= (Message_List *) malloc(sizeof(Message_List));
      if (Head_Message == NULL || Head_Voltage == NULL) {
-          printf("Memory failed to initiate");
+          printf("Linked list failed to initiate");
      }
 
      Head_Voltage->data= 0;
@@ -101,6 +103,37 @@ void linkedList_Init(){
      Head_Message->next = NULL;
 }
 
+int popVoltage(Voltage_List ** head) {
+    int popped_Voltage = -1;
+    Voltage_List * next_Voltage_Value = NULL;
+
+    if (*head == NULL) {
+        return -1;
+    }
+
+    next_Voltage_Value = (*head)->next;
+    popped_Voltage = (*head)->data;
+    free(*head);
+    *head = next_Voltage_Value;
+
+    return popped_Voltage;
+}
+
+int popMessage(Message_List ** head) {
+    int popped_Symbol = -1;
+    Message_List * next_Message_Symbol = NULL;
+
+    if (*head == NULL) {
+        return -1;
+    }
+
+    next_Message_Symbol = (*head)->next;
+    popped_Symbol = (*head)->symbol;
+    free(*head);
+    *head = next_Message_Symbol;
+
+    return popped_Symbol;
+}
 // _________________________________________________
 //  Supporting Functions
 // _________________________________________________
@@ -137,9 +170,80 @@ void Conversion(){
     
 
      }
+
+int Average(Voltage_List * head,  int *highest, int limit){
+    /* This function is used to determine the average and spread
+    of the voltage values used in the DashDot() function
+    */
+    Voltage_List * current = head;
+
+    int total = 0;
+    int average = 0;
+    int num_Element = 0;
+    *highest = current->data;
+
+    while ((current->next != NULL) || (num_Element < limit)) {
+        
+        if ((current->data) > *highest){
+            *highest= current->data;
+        }
+        
+        total += current->data;
+        num_Element += 1;
+        current = current->next;
+    }
+    // Have to run the next 2 lines again to include the final value
+    total += current->data;
+    num_Element += 1;
+    // Then calculate average to define difference between high and low value data points
+    average = total/num_Element;
+
+    return average;
 }
 
-void DashDot(){
+
+int DashDot(Voltage_List * head){
+    Voltage_List * current = head;
+    int highest;
+
+    int current_Count = 0; // this is the count of current consecutive black values detected
+    int lowest_Count = 0; // this is the current estimate of length of a dash
+    int limit = 500;
+    int num_Element = 0;
+
+    int average = Average(Head_Voltage,&highest,limit);
+    
+    while ((highest - average) < 10){
+        /* if this statement is true the message being measured is
+        either only white space or only black spaces */
+        limit = 100 + limit;
+        average = Average(Head_Voltage,&highest,limit);
+        // Thus will keep going until black and white parts detected
+    }
+
+    while (current->next != NULL || (num_Element < limit)) {
+        if (current->data >= average){
+            // Counting the black parts detected
+            current_Count += 1;
+            current = current->next;
+            num_Element += 1;
+      
+        } else {
+            // when 'else' is invoked the next white part is detected
+            
+            if (lowest_Count == 0) {
+                // first 'if' is to set the lowest value length of a dash in the beginning
+                lowest_Count = current_Count;
+            } else if (current_Count < lowest_Count) {
+                // The 'else if' is to reset when a smaller dash length is found
+                lowest_Count = current_Count;
+            }
+            current_Count = 0;
+            current = current->next;
+            num_Element += 1;
+        }
+    }
+    return lowest_Count;
 
 }
 
@@ -172,5 +276,5 @@ int main(){
      
      }
 
-return 0 ;
+return 0;
 }
