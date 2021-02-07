@@ -171,12 +171,12 @@ void *LED_Input(void *vargp){
     int large_WAIT = 1000; // This is the large_WAIT waiting period 
     
     digitalWrite(LED_PIN_1,LOW); // RED -- DOT
-    digitalWrite(LED_PIN_1,LOW); // BLUE -- DASH
+    digitalWrite(LED_PIN_2,LOW); // BLUE -- DASH
 
     delay(large_WAIT);  
-    digitalWrite(LED_PIN_1,HIGH); // BLUE -- DASH -- ON     //    T
+    digitalWrite(LED_PIN_2,HIGH); // BLUE -- DASH -- ON     //    T
     delay(large_WAIT);                                   
-    digitalWrite(LED_PIN_1,LOW); // BLUE -- DASH --OFF  
+    digitalWrite(LED_PIN_2,LOW); // BLUE -- DASH --OFF  
     delay(large_WAIT);                                           //  large_WAIT SPACE
 //-------------------------------------------------------------------------
     digitalWrite(LED_PIN_1,HIGH); // RED -- DOT -- ON       //    E
@@ -197,14 +197,14 @@ void *LED_Input(void *vargp){
     digitalWrite(LED_PIN_1,LOW); // RED -- DOT -- OFF
     delay(large_WAIT);                                           //  large_WAIT SPACE
 //-------------------------------------------------------------------------
-    digitalWrite(LED_PIN_1,HIGH); // BLUE -- DASH -- ON     //    T
+    digitalWrite(LED_PIN_2,HIGH); // BLUE -- DASH -- ON     //    T
     delay(large_WAIT);                                   
-    digitalWrite(LED_PIN_1,LOW); // BLUE -- DASH --OFF  
+    digitalWrite(LED_PIN_2,LOW); // BLUE -- DASH --OFF  
     delay(large_WAIT);                                           //  large_WAIT SPACE
 
 
     digitalWrite(LED_PIN_1,LOW);
-    digitalWrite(LED_PIN_1,LOW);
+    digitalWrite(LED_PIN_2,LOW);
     return NULL;                                        
 }
 
