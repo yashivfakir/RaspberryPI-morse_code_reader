@@ -39,6 +39,7 @@ The repository consists of several files that are explained below. If one is onl
     $ gcc Paper_Input_Reader.c -lwiringPi -lpthread
         or 
     $ gcc LED_Input_Reader.c -lwiringPi -lpthread
+    
         depending on the input method to be used.
 
 ## Usage Instructions
