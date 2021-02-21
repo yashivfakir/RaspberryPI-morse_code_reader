@@ -24,7 +24,8 @@ The repository consists of several files that are explained below. If one is onl
     -- Pseudo Algorithm.txt (Note the final algorithm differs from the this inital version)
   
   For a written overview of the final code and the project as a whole refer to:
-    -- MC Project Final Report.pdf
+    
+    -- MC Project Final Report.pdf (This is the most complete document regarding the code)
   
   Finally the code for the two versions are:
   
