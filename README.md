@@ -4,8 +4,10 @@
 
 This project is meant to interpret a Morse Code message in two ways.
 
-   -- The first way is a paper morse code message.
-   -- The second way is the an LED morse code message. 
+
+      -- The first way is a paper morse code message.
+      -- The second way is the an LED morse code message. 
+   
    
 For the first method, the sequence should be drawn in Black ink on a White paper. For the second method, the sequence is displayed on an LED light. For a detailed description on how the inputs should be drawn refer to MC Project Final Report.pdf. Both input methods are measured using an LDR (Light Dependent Resistor) sensor that is then analysed and converted to an alphanumeric pattern. The reader utilizes a raspberry Pi and coded in C.
 
@@ -25,7 +27,7 @@ The repository consists of several files that are explained below. If one is onl
   
   For a written overview of the final code and the project as a whole refer to:
     
-    -- MC Project Final Report.pdf (This is the most complete document regarding the code)
+    -- MC Project Final Report.pdf 
   
   Finally the code for the two versions are:
   
