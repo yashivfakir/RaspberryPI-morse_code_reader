@@ -30,6 +30,7 @@ The repository consists of several files that are explained below. If one is onl
   
     -- LED_Input_Reader.c
     -- Paper_Input_Reader.c
+    
     (Note both files need to be compiled)
         Use the following code to compile the code on a linux machine:
     $ gcc Paper_Input_Reader.c -lwiringPi -lpthread
