@@ -1,5 +1,6 @@
 // *****************************************************
 // Title: RASPBERRY PI - MORSE CODE READER
+// Input Type: LED Encoded Message
 // Author: Yashiv Fakir
 // Date: 23/01/2021
 // *****************************************************
